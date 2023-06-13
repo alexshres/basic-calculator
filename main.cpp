@@ -3,74 +3,43 @@
 
 #include <iostream>
 #include "stack.h"
+#include <string>
 
-double read_and_eval(std::istream &ins);
+bool is_balanced(std::string &expr);
 
-void evaluate_stack_tops(basic_calculator::Stack<double> &numbers, basic_calculator::Stack<char> &operations);
+double evaluate_expression(std::string &expr);
 
 int main() {
     double answer;
 
-    std::cout << "Fully parenthesized arithmetic expression: " << std::endl;
-    answer = read_and_eval(std::cin);
+    std::string expression;
 
-    std::cout << "Evaluates to " << answer << std::endl;
+    std::cout << "Arithmetic expression with parentheses to show ordering if needed: " << std::endl;
+    std::cin >> expression;
+
+    if (is_balanced(expression)) {
+        answer = evaluate_expression(expression);
+        std::cout << "The answer is: " << answer << std::endl;
+    } else {
+        std::cout << "Parentheses don't match, please check the expression."
+    }
 
     return EXIT_SUCCESS;
 }
 
-
-double read_and_eval(std::istream &ins) {
-    const char DECIMAL = '.';
-    const char RIGHT_PAR = ')';
-
-    basic_calculator::Stack<double> numbers;
-    basic_calculator::Stack<char> operations;
-
-    double number;
-    char symbol;
-
-    while (ins && ins.peek() != '\n') {
-        // checks if the value (using ins.peek()) is a digit or
-        // decimal and if so pushes into std::stack
-        if (std::isdigit(ins.peek()) || (ins.peek() == DECIMAL)) {
-            ins >> number;
-            numbers.push(number);
-        } else if (std::strchr("+_*/", ins.peek()) != NULL) {
-            ins >> symbol;
-            operations.push(symbol);
-        } else if (ins.peek() == RIGHT_PAR) {
-            ins.ignore();
-            evaluate_stack_tops(numbers, operations);
-        } else
-            ins.ignore();
+bool is_balanced(std::string &expr) {
+    int length = strlen(expr.c_str());
+    int counter = 0;
+    for (int i = 0; i < length; ++i) {
+        if (expr[i] == '(')
+            ++counter;
+        else if (expr[i] == ')')
+            --counter;
     }
 
-    return numbers.pop();
+    if (counter == 0)
+        return true;
+
+    return false;
 }
 
-void evaluate_stack_tops(basic_calculator::Stack<double> &numbers, basic_calculator::Stack<char> &operations) {
-    double operand1, operand2;
-
-    operand2 = numbers.pop();
-
-    operand1 = numbers.pop();
-
-    switch (operations.pop()) {
-        case '+':
-            numbers.push(operand1 + operand2);
-            break;
-
-        case '-':
-            numbers.push(operand1 - operand2);
-            break;
-
-        case '*':
-            numbers.push(operand1 * operand2);
-            break;
-
-        case '/':
-            numbers.push(operand1 / operand2);
-            break;
-    }
-}

@@ -20,6 +20,10 @@ namespace basic_calculator {
 
         std::size_t size() const { return used; }
 
+        T peek() const { return data[used - 1]; }
+
+        void print() const;
+
     private:
         std::size_t used;
         T data[CAPACITY];
@@ -28,7 +32,12 @@ namespace basic_calculator {
 
     template<class T>
     void Stack<T>::push(const T &val) {
-        data[used] = val;
+        if (is_empty())
+            data[0] = val;
+        else {
+            data[used] = val;
+        }
+
         ++used;
     }
 
@@ -38,6 +47,18 @@ namespace basic_calculator {
         --used;
 
         return return_val;
+    }
+
+    template<class T>
+    void Stack<T>::print() const {
+        assert(used > 0);
+
+
+        for (std::size_t i = 0; i < used; ++i) {
+            std::cout << data[used - 1 - i] << std::endl;
+        }
+
+        return;
     }
 }
 
